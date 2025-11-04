@@ -33,6 +33,7 @@ class OpTestDataGenerator(object):
             os.makedirs(self.base_dir)
         self.fp16_path = os.path.join(self.base_dir, "fp16")
         self.fp32_path = os.path.join(self.base_dir, "fp32")
+        self.bf16_path = os.path.join(self.base_dir, "bf16")
         self.run_backward = False
         self.fp16_support = True
         
@@ -56,7 +57,7 @@ class OpTestDataGenerator(object):
 
                 info = info.to(device).detach().requires_grad_(rq_grad)
                 # int tensors should not be transfered to float
-                if info.dtype is torch.float16 or info.dtype is torch.float32:
+                if info.dtype is [torch.float16, torch.float32, torch.bfloat16]:
                     ret.append(info.to(data_type).detach().requires_grad_(rq_grad))
                 else:
                     ret.append(info)
@@ -137,14 +138,14 @@ class OpTestDataGenerator(object):
 
             if input_grad:
                 if isinstance(outs, torch.Tensor):
-                    if outs.dtype is torch.float32 or outs.dtype is torch.float16:
+                    if outs.dtype in [torch.float32, torch.float16, torch.bfloat16]:
                         out_grad = torch.ones_like(outs)
                         out_grads = out_grad
                         outs.backward(out_grad)
                         self.run_backward = True
                 elif isinstance(outs, list) or isinstance(outs, tuple):
                     for out in outs:
-                        if out.dtype is torch.float32 or out.dtype is torch.float16:
+                        if out.dtype in [torch.float32, torch.float16, torch.bfloat16]:
                             out_grad = None
                             out_grad = torch.ones_like(out)
                             out_grads.append(out_grad)
@@ -164,6 +165,18 @@ class OpTestDataGenerator(object):
         fp16_inputs = self.gen_inputs(self.input_info, torch.float16)
 
         self.run_with_model_and_inputs(fp16_model, fp16_inputs, self.fp16_path)
+    
+    def run_bf16(self):
+        """
+        Generate the input data and run the model.
+
+        """
+        bf16_model = self.module
+        if isinstance(self.module, torch.nn.Module):
+            bf16_model = self.module.bfloat16()
+        bf16_inputs = self.gen_inputs(self.input_info, torch.bfloat16)
+
+        self.run_with_model_and_inputs(bf16_model, bf16_inputs, self.bf16_path)
 
     def run_fp32(self):
         fp32_inputs = self.gen_inputs(self.input_info, torch.float32)
@@ -173,7 +186,8 @@ class OpTestDataGenerator(object):
     def run_all(self):
         self.run_fp32()
         try:
-            self.run_fp16()
+            # self.run_fp16()
+            self.run_bf16()
         except Exception as e:
             print(e)
             self.fp16_support = False

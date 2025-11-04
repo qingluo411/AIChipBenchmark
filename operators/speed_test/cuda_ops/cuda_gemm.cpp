@@ -50,7 +50,11 @@ void random_init(T *data, size_t m, size_t n, bool trans) {
 template <typename T>
 void print_mat(T* src, size_t size) {
     for (int i=0; i < size; i++) {
-        std::cout << *(src+i) << " ";
+        if constexpr (std::is_same<T, __half>::value) {
+            std::cout << __half2float(*(src+i)) << " ";
+        } else {
+            std::cout << *(src+i) << " ";
+        }
     }
     std::cout << std::endl;
 }

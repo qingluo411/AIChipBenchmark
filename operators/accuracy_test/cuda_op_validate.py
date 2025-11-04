@@ -112,13 +112,23 @@ class CudaOpValidater(object):
         # 1. run float32 validation
         self.fp32_result = self.run(self.module, "fp32", abs_thresh=1e-5, relative_thresh=1e-4)
 
-        # 2. run float16 validation
-        fp16_model = self.module
+        # # 2. run float16 validation
+        # fp16_model = self.module
+        # if isinstance(self.module, torch.nn.Module):
+        #     fp16_model = self.module.half()
+        # self.fp16_result = False
+        # try:
+        #     self.fp16_result = self.run(fp16_model, "fp16", abs_thresh=1e-3, relative_thresh=1e-3)
+        # except Exception as e:
+        #     logger.warning(e)
+        
+        # 3. run bfloat16 validation
+        bf16_model = self.module
         if isinstance(self.module, torch.nn.Module):
-            fp16_model = self.module.half()
-        self.fp16_result = False
+            bf16_model = self.module.bfloat16()
+        self.bf16_result = False
         try:
-            self.fp16_result = self.run(fp16_model, "fp16", abs_thresh=1e-3, relative_thresh=1e-3)
+            self.bf16_result = self.run(bf16_model, "bf16", abs_thresh=1e-3, relative_thresh=1e-3)
         except Exception as e:
             logger.warning(e)
 
@@ -159,7 +169,7 @@ if __name__ == "__main__":
         for name, cfg in config.items():
             tester = CudaOpValidater(cfg, name, gt_path)
             tester.run_all()
-            all_info[name] = dict(passed=(tester.fp32_result and tester.fp16_result))
+            all_info[name] = dict(passed=(tester.fp32_result and tester.bf16_result))
         #  save result to json and csv
         json_file = output_path + "/cuda_val_result.json"
         with open(json_file, "w") as jsonf:

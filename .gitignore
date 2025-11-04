@@ -2,3 +2,7 @@ operators/speed_test/cuda_ops/build/
 */*/*/*/*/*/__pycache__/
 */*/*/*/*/__pycache__/
 */*/*/*/__pycache__/
+*.pt
+*.json
+*.csv
+**/__pycache__

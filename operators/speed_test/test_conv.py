@@ -36,9 +36,9 @@ if __name__=='__main__':
         if not validate:
             df.at[i, 'baseline'] = format(total_time, '.3f')
         else:
-            df.at[i, 'time'] = time
+            df.at[i, 'time'] = total_time
             df.at[i, 'score'] = round(
-                float(df.at[i, 'baseline']) / float(time), 2)
+                float(df.at[i, 'baseline']) / float(total_time), 2)
 
     avg_score = df['score'].mean()
 

@@ -27,7 +27,7 @@ cd cuda_ops
 srun -p $partition --gres=gpu:1 --exclusive build/gemm m k n trans1 trans2 datatype
 
 srun -p $partition --gres=gpu:1 --exclusive build/conv n c h w c_out k_w k_h pad_w pad_h stride_w stride_h datatype
-
+./conv 8 3 224 224 64 3 3 1 1 1 1 16
 ```
 
 参数解释：

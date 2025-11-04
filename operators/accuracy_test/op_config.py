@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 from utils import fix_rand
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device = torch.device("cuda")
 
 
 def permute_wrap(x):
