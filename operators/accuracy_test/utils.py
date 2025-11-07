@@ -90,6 +90,7 @@ def result_diff(t1, t2, abs_thresh=1e-8, relative_thresh=1e-5, total_thresh=0.00
         return t1 == t2
     elif t1 is None and t2 is None:
         logger.warning("got None")
+        return True
     else:
         logger.warning("Failed to diff tensors, one tensor might be empty")
         return False

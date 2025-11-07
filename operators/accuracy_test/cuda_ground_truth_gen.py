@@ -35,7 +35,8 @@ class OpTestDataGenerator(object):
         self.fp32_path = os.path.join(self.base_dir, "fp32")
         self.bf16_path = os.path.join(self.base_dir, "bf16")
         self.run_backward = False
-        self.fp16_support = True
+        self.bf16_support = True
+        self.fp32_support = True
         
         print("module:", str(self.module), '\tinput_info:', str(self.input_info))
 
@@ -184,13 +185,17 @@ class OpTestDataGenerator(object):
 
     @try_deterministic
     def run_all(self):
-        self.run_fp32()
+        try:
+            self.run_fp32()
+        except Exception as e:
+            print(e)
+            self.fp32_support = False
         try:
             # self.run_fp16()
             self.run_bf16()
         except Exception as e:
             print(e)
-            self.fp16_support = False
+            self.bf16_support = False
 
 
 all_info = dict()
@@ -261,7 +266,8 @@ if __name__ == "__main__":
                 input_shapes=tester.get_inputshapes(),
                 need_backward=tester.run_backward,
                 args=args,
-                support_fp16=tester.fp16_support,
+                support_bf16=tester.bf16_support,
+                support_fp32=tester.fp32_support,
             )
 
         with open(json_file, "w") as jsonf:
